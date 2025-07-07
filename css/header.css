@@ -269,7 +269,7 @@
         .dropdown-item.logout:hover {
             background-color: rgba(239, 68, 68, 0.1);
         }
-
+        
         /* Responsive */
         @media (max-width: 768px) {
             .header {

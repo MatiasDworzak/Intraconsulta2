@@ -31,7 +31,7 @@ body {
 
 /* Main Content */
 .main-content {
-    padding: 2rem;
+    padding: 1.5rem 2rem;
     width: 70%;
 }
 
@@ -149,7 +149,7 @@ body {
     /* background: linear-gradient(135deg, #48a65c, #2bd151); */
     /*margin-bottom: 1rem;*/
     color: #efefef;
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: bold;
 }
 
@@ -273,6 +273,15 @@ body {
     
 }
 
+.material-symbols-outlined {
+    font-size: 28px !important;
+    color: white;
+  }
+
+  .operation-card .material-symbols-outlined {
+    font-size: 28px !important;
+    color: white !important;
+  }
 .navbar {
             background-color: #00876c;
             padding: 0.5rem 2rem;
