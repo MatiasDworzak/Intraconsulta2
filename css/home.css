@@ -203,6 +203,7 @@ body {
   
   .operation-title {
     margin: 0; /* Evita márgenes verticales extra de <h3> */
+    padding-left: 10px;
   }
 @media (max-width: 768px) {
     .header {
@@ -256,7 +257,7 @@ body {
     justify-content: center;
     padding: 10px;
     border-radius: 12px;
-    margin-bottom: 10px;
+    
 }
 
 .icon-section-blue{
@@ -268,7 +269,7 @@ body {
     justify-content: center;
     padding: 10px;
     border-radius: 12px;
-    margin-bottom: 10px;
+    
 }
 
 .navbar {
