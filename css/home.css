@@ -135,6 +135,7 @@ body {
     background: #059574;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     gap: 8px;
+    position: relative;
 }
 
 
