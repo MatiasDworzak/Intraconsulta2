@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario Académico</title>
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/header.css">
+  <link rel="icon" type="image/png" href="../images/unlam-logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    .calendario-container {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    
+    .contenido-principal {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .sidebar-filtros {
+      width: 300px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 1.5rem;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: sticky;
+      top: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      scrollbar-width: thin;
+      scrollbar-color: #00876c rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-filtros::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .sidebar-filtros::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    
+    .sidebar-filtros::-webkit-scrollbar-thumb {
+      background: #00876c;
+      border-radius: 4px;
+    }
+    
+    .sidebar-filtros::-webkit-scrollbar-thumb:hover {
+      background: #00695c;
+    }
+    
+    .calendario-titulo {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    .calendario-subtitulo {
+      font-size: 1.2rem;
+      color: #ccc;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .seccion-calendario {
+      margin-bottom: 3rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      scroll-margin-top: 2rem;
+    }
+    
+    .seccion-titulo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #00876c;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #00876c;
+    }
+    
+    .tabla-calendario {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .tabla-calendario th {
+      background: #00876c;
+      color: #fff;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .tabla-calendario td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+    }
+    
+    .tabla-calendario tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .actividad {
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .fecha {
+      color: #ccc;
+    }
+    
+    .fecha-importante {
+      color: #ff6b6b;
+      font-weight: 600;
+    }
+    
+    .departamento {
+      color: #4ecdc4;
+      font-weight: 500;
+    }
+    
+    .horario {
+      color: #ffe66d;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    
+    .nota {
+      font-style: italic;
+      color: #888;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    
+    .btn-volver {
+      background-color: #00876c;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 2rem;
+      display: block;
+      width: 100%;
+      max-width: 200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .btn-volver:hover {
+      background-color: #00695c;
+    }
+    
+    /* Estilos para el sidebar de filtros */
+    .filtros-titulo {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #00876c;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .categoria-filtro {
+      margin-bottom: 1.5rem;
+    }
+    
+    .categoria-titulo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .filtro-item {
+      display: block;
+      color: #ccc;
+      text-decoration: none;
+      padding: 0.5rem 0;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      border-radius: 5px;
+      padding-left: 0.5rem;
+    }
+    
+    .filtro-item:hover {
+      color: #00876c;
+      background: rgba(0, 135, 108, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .filtro-item.activo {
+      color: #00876c;
+      background: rgba(0, 135, 108, 0.2);
+      font-weight: 600;
+    }
+    
+    .busqueda-container {
+      margin-bottom: 1.5rem;
+    }
+    
+    .busqueda-input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    
+    .busqueda-input::placeholder {
+      color: #888;
+    }
+    
+    .busqueda-input:focus {
+      outline: none;
+      border-color: #00876c;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .fecha-proxima {
+      background: rgba(255, 107, 107, 0.1);
+      border-left: 3px solid #ff6b6b;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+    }
+    
+    .fecha-proxima-titulo {
+      color: #ff6b6b;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .fecha-proxima-desc {
+      color: #fff;
+      font-size: 0.85rem;
+    }
+    
+    .estadisticas {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .estadistica-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .estadistica-label {
+      color: #ccc;
+    }
+    
+    .estadistica-valor {
+      color: #00876c;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 1024px) {
+      .calendario-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .sidebar-filtros {
+        width: 100%;
+        position: static;
+        order: -1;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .calendario-container {
+        padding: 1rem;
+      }
+      
+      .calendario-titulo {
+        font-size: 2rem;
+      }
+      
+      .seccion-titulo {
+        font-size: 1.3rem;
+      }
+      
+      .tabla-calendario th,
+      .tabla-calendario td {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header" style="height: 70px;">
+    <div class="logo">
+      <a href="home.html" class="logo-link">
+        <img id="logo-intraconsulta" src="../images/unlam-logo.png" alt="logo">
+        <span id="titulo">Intraconsulta</span>
+      </a>
+    </div>
+    <div class="user-container">
+        <div class="user-dropdown">
+            <div class="user-info">
+                <div class="user-name">RODRIGUEZ, PEDRO ROMAN</div>
+                <div class="estate-user">Tu estado es<span class="negrita-verde">ACTIVO</span><span class="material-symbols-outlined dropdown-arrow""> expand_more</span></div>
+            </div>
+            
+            <div class="user-dropdown-content">
+                <div class="dropdown-header">
+                    <div class="user-name-full">RODRIGUEZ, PEDRO ROMAN</div>
+                    <div class="user-status">Estado: <span class="negrita-verde">ACTIVO</span></div>
+                </div>
+                
+                <a href="#" class="dropdown-item">
+                    <span class="material-symbols-outlined">person</span>
+                    Mi Perfil
+                </a>
+                
+                <a href="#" class="dropdown-item">
+                    <span class="material-symbols-outlined">settings</span>
+                    Configuración
+                </a>
+                
+                <a href="#" class="dropdown-item">
+                    <span class="material-symbols-outlined">email</span>
+                    Office 365
+                </a>
+                
+                <a href="#" class="dropdown-item">
+                    <span class="material-symbols-outlined">lock</span>
+                    Cambiar Contraseña
+                </a>
+                
+                <a href="#" class="dropdown-item">
+                    <span class="material-symbols-outlined">help</span>
+                    Ayuda y Soporte
+                </a>
+                
+                <a href="#" class="dropdown-item">
+                    <span class="material-symbols-outlined">description</span>
+                    Términos y Condiciones
+                </a>
+                
+                <a href="/html/login.html" class="dropdown-item logout">
+                    <span class="material-symbols-outlined">logout</span>
+                    Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+  </header>
+  
+  <nav class="navbar">
+    <ul class="nav-menu">
+      <li style="margin-left: 5px;" class="nav-item dropdown">
+        <a href="#"  class="nav-link">Materias <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="materiasEnCurso.html">Materias en Curso</a>
+          <a href="#">Materias regularizadas</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link">Inscripciones <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="#">Oferta de materias</a>
+          <a href="InscripcionMaterias.html">Inscripción a materias</a>
+          <a href="#">Inscripción a Finales</a>
+          <a href="#">Verificacion de materias</a>
+          <a href="#">Verificacion de finales</a>
+          <a href="#">Fecha de finales</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link">Solicitudes <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="#">Titulo/Analitico de Pre/Pos/Grado</a>
+          <a href="#">Analítico Parcial</a>
+          <a href="#">Cambio/Simultaneidad de Carreras</a>
+          <a href="#">Baja Inscripcion Anual</a>
+          <a href="#">Legalizacion de programas</a>
+          <a href="#">Libreta Universitaria</a>
+          <a href="#">Homologaciones Interdepartamentales</a>
+          <a href="#">Excepcionalidad</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link">Certificados <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="#">Certificado de Alumno Regular</a>
+          <a href="#">Certificado Materias Aprobadas</a>
+          <a href="#">Competencias básicas</a>
+          <a href="#">Descargar Certificados</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link">Constancias <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="#">Constancia de Parcial</a>
+          <a href="#">Constancia de Final</a>
+          <a href="#">Constancia de Título</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link">Trámites online <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="#">Activaciones</a>
+          <a href="#">Boleto estudiantil</a>
+          <a href="#">Cambio de plan</a>
+          <a href="#">Equivalencias</a>
+          <a href="#">Extension de correlativas</a>
+          <a href="#">Reclamo de notas</a>
+          <a href="#">Reincorporación</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link">Otras operaciones <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="#">Resoluciones</a>
+          <a href="#">Ficha Médica</a>
+          <a href="#">Contacto</a>
+          <a href="#">BIDI</a>
+          <a href="#">Validacion Email Tramites</a>
+          <a href="#">Términos y Condiciones</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link">Información importante <span class="material-symbols-outlined">expand_more</span></a>
+        <div class="dropdown-content">
+          <a href="#">Plan de Estudios</a>
+          <a href="historialAcademico.html">Historial académico</a>
+          <a href="CalenderioAcademico.html">Calendario académico</a>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="calendario-container">
+    <!-- Sidebar con filtros -->
+    <aside class="sidebar-filtros">
+      <h3 class="filtros-titulo">📅 Navegación Rápida</h3>
+      
+      <!-- Buscador -->
+      <div class="busqueda-container">
+        <input type="text" class="busqueda-input" placeholder="🔍 Buscar actividad..." id="busqueda">
+      </div>
+      
+      <!-- Próximas fechas importantes -->
+      <div class="fecha-proxima">
+        <div class="fecha-proxima-titulo">⚠️ Próximas Fechas</div>
+        <div class="fecha-proxima-desc">Inscripción 1er Cuatrimestre: 10-13 Marzo 2025</div>
+      </div>
+      
+      <!-- Estadísticas -->
+      <div class="estadisticas">
+        <div class="estadistica-item">
+          <span class="estadistica-label">Períodos:</span>
+          <span class="estadistica-valor">2 Cuatrimestres</span>
+        </div>
+        <div class="estadistica-item">
+          <span class="estadistica-label">Exámenes:</span>
+          <span class="estadistica-valor">Julio y Diciembre</span>
+        </div>
+        <div class="estadistica-item">
+          <span class="estadistica-label">Cursos:</span>
+          <span class="estadistica-valor">2 Instancias</span>
+        </div>
+      </div>
+      
+      <!-- Categorías de filtros -->
+      <div class="categoria-filtro">
+        <div class="categoria-titulo">📚 Inscripciones</div>
+        <a href="#primer-cuatrimestre" class="filtro-item">1er Cuatrimestre</a>
+        <a href="#segundo-cuatrimestre" class="filtro-item">2do Cuatrimestre</a>
+        <a href="#examenes-julio" class="filtro-item">Exámenes Julio</a>
+        <a href="#examenes-diciembre" class="filtro-item">Exámenes Diciembre</a>
+      </div>
+      
+      <div class="categoria-filtro">
+        <div class="categoria-titulo">📋 Trámites</div>
+        <a href="#cambio-carrera" class="filtro-item">Cambio de Carrera</a>
+        <a href="#exencion-correlativas" class="filtro-item">Exención Correlativas</a>
+        <a href="#equivalencias" class="filtro-item">Equivalencias</a>
+        <a href="#baja-materias" class="filtro-item">Baja de Materias</a>
+      </div>
+      
+      <div class="categoria-filtro">
+        <div class="categoria-titulo">🎓 Ingresantes</div>
+        <a href="#activacion-graduados" class="filtro-item">Activación Graduados</a>
+        <a href="#curso-ingreso-1" class="filtro-item">Curso Ingreso 1ra</a>
+        <a href="#curso-ingreso-2" class="filtro-item">Curso Ingreso 2da</a>
+      </div>
+      
+      <div class="categoria-filtro">
+        <div class="categoria-titulo">🏢 Departamentos</div>
+        <a href="#dpto-humanidades" class="filtro-item">Humanidades</a>
+        <a href="#dpto-salud" class="filtro-item">Ciencias de la Salud</a>
+        <a href="#dpto-economicas" class="filtro-item">Cs. Económicas</a>
+        <a href="#dpto-derecho" class="filtro-item">Derecho</a>
+        <a href="#dpto-ingenieria" class="filtro-item">Ingeniería</a>
+      </div>
+      
+      <div class="categoria-filtro">
+        <div class="categoria-titulo">📅 Fechas Importantes</div>
+        <a href="#inicio-clases" class="filtro-item">Inicio de Clases</a>
+        <a href="#fin-clases" class="filtro-item">Fin de Clases</a>
+        <a href="#verificaciones" class="filtro-item">Verificaciones</a>
+      </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="contenido-principal">
+      <h1 class="calendario-titulo">Calendario Académico 2025</h1>
+      <p class="calendario-subtitulo">Información actualizada sobre fechas importantes del año académico</p>
+
+      <!-- Cambio de Carrera -->
+      <div class="seccion-calendario" id="cambio-carrera">
+        <h2 class="seccion-titulo">Solicitud de Cambio de Carrera y Simultaneidad</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Todas las carreras excepto Medicina, Arquitectura y Educación Física</td>
+              <td class="fecha">20 de enero al 10 de febrero de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Medicina, Arquitectura y Educación Física</td>
+              <td class="fecha">22 al 26 de septiembre de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Exención de Correlativas -->
+      <div class="seccion-calendario" id="exencion-correlativas">
+        <h2 class="seccion-titulo">Exención de Correlativas por Últimas Materias</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Primer cuatrimestre</td>
+              <td class="fecha">10 al 24 de febrero de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Segundo cuatrimestre</td>
+              <td class="fecha">07 al 18 de julio de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Equivalencias -->
+      <div class="seccion-calendario" id="equivalencias">
+        <h2 class="seccion-titulo">Solicitud de Equivalencias y Homologación de Materias</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Homologación interdepartamental (para materias aprobadas en UNLaM)</td>
+              <td class="fecha">23 de junio al 04 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Equivalencias (para materias aprobadas en otra Universidad)</td>
+              <td class="fecha">23 de junio al 04 de julio de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activación Graduados -->
+      <div class="seccion-calendario" id="activacion-graduados">
+        <h2 class="seccion-titulo">Activación Graduados Internos, Pase de Universidad y Graduados Universitarios Externos (Ingreso 2026)</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Inscripción por Sistema de Ingresantes y recepción de documentación</td>
+              <td class="fecha">25 de agosto al 05 de septiembre de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Activación Graduados internos para las carreras de Medicina, Arquitectura y Educación Física</td>
+              <td class="fecha">25 de agosto al 05 de septiembre de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Primer Cuatrimestre -->
+      <div class="seccion-calendario" id="primer-cuatrimestre">
+        <h2 class="seccion-titulo">Primer Cuatrimestre 2025</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Inscripción a materias EFC</td>
+              <td class="fecha-importante">07 de marzo de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inscripción a materias Departamentos</td>
+              <td class="fecha-importante">10 al 13 de marzo de 2025</td>
+            </tr>
+            <tr id="dpto-salud">
+              <td class="actividad">
+                <span class="departamento">Dpto. de Ciencias de la Salud</span>
+                <div class="horario">DNI impar: 11 a 14 horas<br>DNI Par: 17 a 20 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">10 de marzo de 2025</td>
+            </tr>
+            <tr id="dpto-humanidades">
+              <td class="actividad">
+                <span class="departamento">Dpto. de Humanidades y Cs. Sociales</span>
+                <div class="horario">DNI Impar: 8 a 11 horas<br>DNI Par: 14 a 17 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">10 de marzo de 2025</td>
+            </tr>
+            <tr id="dpto-economicas">
+              <td class="actividad">
+                <span class="departamento">Dpto. de Cs. Económicas</span>
+                <div class="horario">DNI impar: 11 a 14 horas<br>DNI Par: 17 a 20 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">11 de marzo de 2025</td>
+            </tr>
+            <tr id="dpto-derecho">
+              <td class="actividad">
+                <span class="departamento">Dpto. de Derecho y C. Política</span>
+                <div class="horario">DNI Impar: 8 a 11 horas<br>DNI Par: 14 a 17 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">11 de marzo de 2025</td>
+            </tr>
+            <tr id="dpto-ingenieria">
+              <td class="actividad">
+                <span class="departamento">Dpto. de Ingeniería e Inv. Tecnológicas<br>Dpto. Arquitectura y Urbanismo</span>
+                <div class="horario">DNI Impar: 09 a 14 horas<br>DNI par: 14 a 19 horas<br>Todos: 19 a 23 horas</div>
+              </td>
+              <td class="fecha">12 de marzo de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Todos los Departamentos</td>
+              <td class="fecha">13 de marzo de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inscripción a materias APM, EAMC y Posgrado</td>
+              <td class="fecha">14 de marzo de 2025</td>
+            </tr>
+            <tr id="verificaciones">
+              <td class="actividad">Verificación de inscripción a materias EFC</td>
+              <td class="fecha">17 de marzo de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Verificación de inscripción a materias Departamentos</td>
+              <td class="fecha">26 de marzo de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Verificación de inscripción a materias APM, EAMC y Posgrado</td>
+              <td class="fecha">27 de marzo de 2025</td>
+            </tr>
+            <tr id="inicio-clases">
+              <td class="actividad">Inicio de clases</td>
+              <td class="fecha-importante">31 de marzo de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inicio de clases ingresantes</td>
+              <td class="fecha-importante">07 de abril de 2025</td>
+            </tr>
+            <tr id="fin-clases">
+              <td class="actividad">Finalización de clases</td>
+              <td class="fecha">19 de julio de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Exámenes Julio -->
+      <div class="seccion-calendario" id="examenes-julio">
+        <h2 class="seccion-titulo">Exámenes Turno Julio 2025</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Inscripción a exámenes finales, libres y acreditaciones</td>
+              <td class="fecha">24 y 25 de junio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Verificación de inscripción</td>
+              <td class="fecha">3 y 4 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Exámenes</td>
+              <td class="fecha-importante">24 de julio al 2 de agosto de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Baja de Materias -->
+      <div class="seccion-calendario" id="baja-materias">
+        <h2 class="seccion-titulo">Solicitud de Baja de Materias Anuales</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Todas las carreras</td>
+              <td class="fecha">14 al 18 de julio de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Curso de Ingreso 1ra Instancia -->
+      <div class="seccion-calendario" id="curso-ingreso-1">
+        <h2 class="seccion-titulo">Curso de Ingreso 2026 (1ra instancia)</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Apertura del formulario de preinscripción en Sistema de Ingresantes</td>
+              <td class="fecha">12 de mayo al 13 de junio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Entrega de documentación de inscripción en Dirección de Alumnos por terminación de DNI</td>
+              <td class="fecha">19 de mayo al 13 de junio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inicio Curso de Ingreso</td>
+              <td class="fecha-importante">21 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Finalización Curso de Ingreso</td>
+              <td class="fecha">10 de diciembre de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Segundo Cuatrimestre -->
+      <div class="seccion-calendario" id="segundo-cuatrimestre">
+        <h2 class="seccion-titulo">Cursos Segundo Cuatrimestre 2025</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Inscripción a materias EFC</td>
+              <td class="fecha-importante">25 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inscripción a materias Departamentos</td>
+              <td class="fecha-importante">29 de julio al 01 de agosto de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">
+                <span class="departamento">Dpto. de Humanidades y Cs. Sociales</span>
+                <div class="horario">DNI Par: 8 a 11 horas<br>DNI Impar: 14 a 17 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">29 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">
+                <span class="departamento">Dto. de Ciencias de la Salud</span>
+                <div class="horario">DNI Par: 11 a 14 horas<br>DNI Impar: 17 a 20 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">29 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">
+                <span class="departamento">Dpto. de Derecho y C. Política</span>
+                <div class="horario">DNI Par: 8 a 11 horas<br>DNI Impar: 14 a 17 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">30 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">
+                <span class="departamento">Dpto. de Cs. Económicas</span>
+                <div class="horario">DNI Par: 11 a 14 horas<br>DNI Impar: 17 a 20 horas<br>Todos: 20 a 23 horas</div>
+              </td>
+              <td class="fecha">30 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">
+                <span class="departamento">Dpto. de Ingeniería e Inv. Tecnológicas<br>Dpto. Arquitectura y Urbanismo<br>Dpto. Odontología</span>
+                <div class="horario">DNI Par: 09 a 14 horas<br>DNI Impar: 14 a 19 horas<br>Todos: 19 a 23 horas</div>
+              </td>
+              <td class="fecha">31 de julio de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Todos los Departamentos</td>
+              <td class="fecha">01 de agosto de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inscripción a materias APM, EAMC y Posgrado</td>
+              <td class="fecha">06 de agosto de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Verificación de inscripción a materias EFC</td>
+              <td class="fecha">04 de agosto de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Verificación de inscripción a materias APM, EAMC y Posgrado</td>
+              <td class="fecha">13 de agosto de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Verificación de inscripción a materias Departamentos</td>
+              <td class="fecha">14 de agosto de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inicio de clases</td>
+              <td class="fecha-importante">18 de agosto de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Finalización de clases</td>
+              <td class="fecha">06 de diciembre de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Curso de Ingreso 2da Instancia -->
+      <div class="seccion-calendario" id="curso-ingreso-2">
+        <h2 class="seccion-titulo">Curso de Ingreso 2026 (2da instancia)</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Apertura del formulario de preinscripción en Sistema de Ingresantes</td>
+              <td class="fecha">29 de septiembre al 24 de octubre de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Entrega de documentación de inscripción en Dirección de Alumnos por terminación de DNI</td>
+              <td class="fecha">06 al 24 de octubre de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Inicio de clases</td>
+              <td class="fecha-importante">02 de febrero de 2026</td>
+            </tr>
+            <tr>
+              <td class="actividad">Finalización de clases</td>
+              <td class="fecha">07 de marzo de 2026</td>
+            </tr>
+            <tr>
+              <td class="actividad">Exámenes</td>
+              <td class="fecha-importante">09 al 13 de marzo de 2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Exámenes Diciembre -->
+      <div class="seccion-calendario" id="examenes-diciembre">
+        <h2 class="seccion-titulo">Exámenes Turno Diciembre 2025</h2>
+        <table class="tabla-calendario">
+          <thead>
+            <tr>
+              <th>Actividades</th>
+              <th>Fechas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="actividad">Inscripción a exámenes finales, libres y acreditaciones</td>
+              <td class="fecha">13 y 14 de noviembre de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Verificación de inscripción</td>
+              <td class="fecha">19 de noviembre de 2025</td>
+            </tr>
+            <tr>
+              <td class="actividad">Exámenes</td>
+              <td class="fecha-importante">11 al 20 de diciembre de 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="nota">Calendario Académico sujeto a modificaciones.</p>
+      
+      <button class="btn-volver" onclick="window.history.back()">Volver</button>
+    </main>
+  </div>
+
+  <script>
+    // Funcionalidad de navegación suave
+    document.querySelectorAll('.filtro-item').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Resaltar el enlace activo
+          document.querySelectorAll('.filtro-item').forEach(item => {
+            item.classList.remove('activo');
+          });
+          this.classList.add('activo');
+        }
+      });
+    });
+    
+    // Funcionalidad de búsqueda
+    document.getElementById('busqueda').addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const sections = document.querySelectorAll('.seccion-calendario');
+      
+      sections.forEach(section => {
+        const text = section.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          section.style.display = 'block';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
